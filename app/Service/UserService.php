@@ -1,32 +1,30 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Service;
 
-use App\Http\Controllers\Controller;
-use App\Traits\HttpResponses;
-use Illuminate\Http\Request;
 use App\Models\User;
+use App\Traits\HttpResponses;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
-class TesteController extends Controller
+class UserService
 {
     use HttpResponses;
-
-    public function index()
+    public function getAllUsers()
     {
         return User::all();
     }
 
-
-    public function create(Request $request)
+    public function getUserById(int $id)
     {
-        //
+        return User::findOrFail($id);
     }
 
-    public function store(Request $request)
+    public function registerUser(Request $request): JsonResponse
     {
-        // Validação dos dados recebidos
+
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
             'cpf' => ['required', 'string', 'unique:users'],
@@ -36,10 +34,9 @@ class TesteController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->error('Invalid data', 422, $validator->errors());
+            return $this->error('Invalid data', 400, $validator->errors());
         }
 
-        // Criação do novo usuário
         try {
             $user = User::create([
                 'name' => $request->name,
@@ -49,30 +46,9 @@ class TesteController extends Controller
                 'role' => $request->role,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Erro ao criar usuário.'], 500);
+            return response()->json(['error' => 'Error to create User.'], 500);
         }
 
         return $this->success('User registered successfully!', 201, $user);
-    }
-
-
-    public function show($id)
-    {
-        return User::where('id', $id)->first();
-    }
-
-    public function edit($id)
-    {
-        //
-    }
-
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    public function destroy($id)
-    {
-        //
     }
 }

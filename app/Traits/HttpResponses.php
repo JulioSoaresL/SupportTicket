@@ -2,11 +2,11 @@
 
 namespace App\Traits;
 
-use Illuminate\Support\MessageBag;
+use Illuminate\Http\JsonResponse;
 
 trait HttpResponses
 {
-    public function success(string $message, int $status, $data = [])
+    public function success(string $message, int $status, $data = []): JsonResponse
     {
         return response()->json([
             'message' => $message,
@@ -15,7 +15,7 @@ trait HttpResponses
         ], $status);
     }
 
-    public function error(string $message, int $status, $errors, array $data = [])
+    public function error(string $message, int $status, $errors, array $data = []): JsonResponse
     {
         return response()->json([
             'message' => $message,
