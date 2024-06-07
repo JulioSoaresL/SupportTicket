@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+  postgres:
+    image: bitnami/postgresql:latest
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_DB=supportApp
+    volumes:
+      - support_pg_data:/bitnami/postgresql
+
+  app:
+    image: 'php:7.3-fpm'
+    ports:
+      - "8000:8000"
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: supportApp
+      DB_USERNAME: docker
+      DB_PASSWORD: docker
+    volumes:
+      - .:/var/www/html
+    command: ["sh", "-c", "until PGPASSWORD=\"docker\" pg_isready -h postgres -p 5432; do sleep 1; done; cd /var/www/html && php -S 0.0.0.0:8000 -t public"]
+
+volumes:
+  support_pg_data:
